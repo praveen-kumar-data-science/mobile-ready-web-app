@@ -1,187 +1,105 @@
-import React, { useState, useEffect } from 'react';
-import { Habit } from './types/habit';
+import React, { useState, useEffect, useCallback } from 'react';
+import './styles/globals.css';
+import { Habit, TabId, Theme } from './types/habit';
 import { habitAPI } from './services/habitAPI';
-import AddHabitForm from './components/AddHabitForm';
-import HabitList from './components/HabitList';
+import TabBar from './components/TabBar';
+import AddHabitModal from './components/AddHabitModal';
+import TodayPage from './pages/TodayPage';
+import CalendarPage from './pages/CalendarPage';
+import StatsPage from './pages/StatsPage';
+import SettingsPage from './pages/SettingsPage';
 
 const App: React.FC = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [activeTab, setActiveTab] = useState<TabId>('today');
+  const [showAdd, setShowAdd] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) ?? 'light');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Load habits on mount
+  // Apply theme to document
   useEffect(() => {
-    loadHabits();
-  }, []);
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
-  const loadHabits = async () => {
+  const loadHabits = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
       const data = await habitAPI.getAllHabits();
       setHabits(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load habits');
-      console.error(err);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => { loadHabits(); }, [loadHabits]);
+
+  const handleAddHabit = async (data: Omit<Habit, 'id' | 'createdAt' | 'completions' | 'archived'>) => {
+    try {
+      const h = await habitAPI.createHabit(data);
+      setHabits(prev => [...prev, h]);
+    } catch (e) { console.error(e); }
   };
 
-  const handleAddHabit = async (habitData: Omit<Habit, 'id' | 'createdAt' | 'completions'>) => {
+  const handleToggle = async (id: number) => {
+    const today = new Date().toISOString().split('T')[0];
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
     try {
-      const newHabit = await habitAPI.createHabit(habitData);
-      setHabits([...habits, newHabit]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create habit');
-      console.error(err);
-    }
-  };
-
-  const handleToggleCompletion = async (habitId: number) => {
-    try {
-      const habit = habits.find(h => h.id === habitId);
-      if (!habit) return;
-
-      if (habit.completions.includes(selectedDate)) {
-        await habitAPI.removeCompletion(habitId, selectedDate);
+      let updated: Habit;
+      if (habit.completions.includes(today)) {
+        updated = await habitAPI.removeCompletion(id, today);
       } else {
-        await habitAPI.logCompletion(habitId, selectedDate);
+        updated = await habitAPI.logCompletion(id, today);
       }
-
-      // Reload habits to sync state
-      await loadHabits();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update habit');
-      console.error(err);
-    }
+      setHabits(prev => prev.map(h => h.id === id ? updated : h));
+    } catch (e) { console.error(e); }
   };
 
-  const handleDeleteHabit = async (habitId: number) => {
+  const handleDelete = async (id: number) => {
     try {
-      await habitAPI.deleteHabit(habitId);
-      setHabits(habits.filter(h => h.id !== habitId));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete habit');
-      console.error(err);
-    }
+      await habitAPI.deleteHabit(id);
+      setHabits(prev => prev.filter(h => h.id !== id));
+    } catch (e) { console.error(e); }
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  };
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text2)' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>⚛️</div>
+          <div style={{ fontWeight: 600 }}>Loading Atoms...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0f2f5', padding: '20px' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ color: '#333', marginBottom: '8px' }}>Atoms - Habit Tracker</h1>
-        <p style={{ color: '#666', marginBottom: '24px' }}>
-          Build better habits, one day at a time
-        </p>
-
-        {error && (
-          <div
-            style={{
-              backgroundColor: '#ffebee',
-              color: '#c62828',
-              padding: '12px',
-              borderRadius: '4px',
-              marginBottom: '20px'
-            }}
-          >
-            {error}
-          </div>
+    <div className="app-shell">
+      <div className="page-area">
+        {activeTab === 'today' && (
+          <TodayPage
+            habits={habits}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
+            onAdd={() => setShowAdd(true)}
+          />
         )}
-
-        {/* Date Navigation */}
-        <div
-          style={{
-            backgroundColor: 'white',
-            padding: '16px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <button
-            onClick={() => {
-              const prev = new Date(selectedDate);
-              prev.setDate(prev.getDate() - 1);
-              setSelectedDate(prev.toISOString().split('T')[0]);
-            }}
-            style={{
-              padding: '8px 12px',
-              backgroundColor: '#e0e0e0',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            ← Previous
-          </button>
-
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
-              {formatDate(selectedDate)}
-            </p>
-          </div>
-
-          <button
-            onClick={() => {
-              const next = new Date(selectedDate);
-              next.setDate(next.getDate() + 1);
-              setSelectedDate(next.toISOString().split('T')[0]);
-            }}
-            style={{
-              padding: '8px 12px',
-              backgroundColor: '#e0e0e0',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Next →
-          </button>
-        </div>
-
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-            Loading habits...
-          </div>
-        ) : (
-          <>
-            <AddHabitForm onAdd={handleAddHabit} />
-            <HabitList
-              habits={habits}
-              onToggleCompletion={handleToggleCompletion}
-              onDeleteHabit={handleDeleteHabit}
-              selectedDate={selectedDate}
-            />
-          </>
-        )}
-
-        {/* Footer Stats */}
-        {habits.length > 0 && !loading && (
-          <div
-            style={{
-              backgroundColor: 'white',
-              padding: '16px',
-              borderRadius: '8px',
-              marginTop: '20px',
-              textAlign: 'center',
-              color: '#666'
-            }}
-          >
-            <p style={{ margin: '0' }}>
-              {habits.filter(h => h.completions.includes(selectedDate)).length} of {habits.length} habits completed today
-            </p>
-          </div>
+        {activeTab === 'calendar' && <CalendarPage habits={habits} />}
+        {activeTab === 'stats' && <StatsPage habits={habits} />}
+        {activeTab === 'settings' && (
+          <SettingsPage theme={theme} onToggleTheme={toggleTheme} habitsCount={habits.length} />
         )}
       </div>
+
+      <TabBar active={activeTab} onChange={setActiveTab} />
+
+      {showAdd && (
+        <AddHabitModal onAdd={handleAddHabit} onClose={() => setShowAdd(false)} />
+      )}
     </div>
   );
 };

@@ -21,6 +21,7 @@ export function setHabitRoutes(app: Express): void {
   app.post('/api/habits', (req: Request, res: Response) => {
     try {
       const { name, description, frequency, color } = req.body;
+      const { emoji } = req.body;
       if (!name || !frequency || !color) {
         res.status(400).json({ error: 'Missing required fields' });
         return;
@@ -29,7 +30,8 @@ export function setHabitRoutes(app: Express): void {
         name,
         description: description || '',
         frequency,
-        color
+        color,
+        emoji: emoji || '🎯',
       });
       res.status(201).json(habit);
     } catch (error) {
