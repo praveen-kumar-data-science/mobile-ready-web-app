@@ -20,15 +20,24 @@ export function setHabitRoutes(app: Express): void {
   // Create habit
   app.post('/api/habits', (req: Request, res: Response) => {
     try {
-      const { name, description, frequency, color } = req.body;
-      const { emoji } = req.body;
-      if (!name || !frequency || !color) {
-        res.status(400).json({ error: 'Missing required fields' });
+      const { name, description, frequency, color, emoji, action, cue, identity } = req.body;
+      const nextAction = String(action || name || '').trim();
+      const nextCue = String(cue || '').trim();
+      const nextIdentity = String(identity || '').trim();
+
+      if (!nextAction || !nextCue || !nextIdentity || !frequency || !color) {
+        res.status(400).json({ error: 'Action, time or location, identity, frequency, and color are required' });
         return;
       }
+
+      const nextDescription = String(description || `I will ${nextAction}, ${nextCue} so that I can become ${nextIdentity} I want to be.`).trim();
+
       const habit = habitService.createHabit({
-        name,
-        description: description || '',
+        name: String(name || nextAction).trim(),
+        description: nextDescription,
+        action: nextAction,
+        cue: nextCue,
+        identity: nextIdentity,
         frequency,
         color,
         emoji: emoji || '🎯',

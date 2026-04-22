@@ -6,6 +6,9 @@ export interface Habit {
   id: number;
   name: string;
   description: string;
+  action: string;
+  cue: string;
+  identity: string;
   frequency: 'daily' | 'weekly';
   color: string;
   emoji: string;

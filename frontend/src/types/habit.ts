@@ -2,6 +2,9 @@ export interface Habit {
   id: number;
   name: string;
   description: string;
+  action: string;
+  cue: string;
+  identity: string;
   frequency: 'daily' | 'weekly';
   weekDays?: number[]; // 0=Sun..6=Sat for weekly habits
   color: string;
@@ -23,3 +26,7 @@ export interface HabitStats {
 export type Theme = 'light' | 'dark';
 
 export type TabId = 'today' | 'calendar' | 'stats' | 'settings';
+
+export function buildHabitStatement(action: string, cue: string, identity: string): string {
+  return `I will ${action.trim()}, ${cue.trim()} so that I can become ${identity.trim()} I want to be.`;
+}

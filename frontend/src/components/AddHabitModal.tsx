@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Habit } from '../types/habit';
+import { Habit, buildHabitStatement } from '../types/habit';
 
 const EMOJIS = ['🏃','💧','📚','🧘','💪','🥗','😴','✍️','🎯','🎸','🧠','❤️','🌿','☀️','🍎','🏋️','🚴','🎨','📝','🧹'];
 const COLORS = ['#6c5ce7','#00b894','#0984e3','#e17055','#fdcb6e','#e84393','#00cec9','#a29bfe','#55efc4','#fd79a8'];
@@ -14,16 +14,34 @@ interface AddHabitModalProps {
 }
 
 const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [action, setAction] = useState('');
+  const [cue, setCue] = useState('');
+  const [identity, setIdentity] = useState('');
   const [emoji, setEmoji] = useState(EMOJIS[0]);
   const [color, setColor] = useState(COLORS[0]);
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
 
+  const statement = buildHabitStatement(action || '<habit>', cue || '<time/location>', identity || '<type of person>');
+  const canSubmit = !!action.trim() && !!cue.trim() && !!identity.trim();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    onAdd({ name: name.trim(), description, emoji, color, frequency });
+    if (!canSubmit) return;
+
+    const nextAction = action.trim();
+    const nextCue = cue.trim();
+    const nextIdentity = identity.trim();
+
+    onAdd({
+      name: nextAction,
+      description: buildHabitStatement(nextAction, nextCue, nextIdentity),
+      action: nextAction,
+      cue: nextCue,
+      identity: nextIdentity,
+      emoji,
+      color,
+      frequency,
+    });
     onClose();
   };
 
@@ -34,23 +52,41 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: 'var(--text)' }}>New Habit</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">NAME</label>
+            <label className="form-label">I WILL</label>
             <input
               className="form-input"
-              placeholder="e.g. Morning Run"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              placeholder="e.g. read 10 pages"
+              value={action}
+              onChange={e => setAction(e.target.value)}
               autoFocus
             />
           </div>
           <div className="form-group">
-            <label className="form-label">DESCRIPTION (optional)</label>
+            <label className="form-label">AT THIS TIME OR LOCATION</label>
             <input
               className="form-input"
-              placeholder="Why is this habit important?"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
+              placeholder="e.g. at 9 PM on my couch"
+              value={cue}
+              onChange={e => setCue(e.target.value)}
             />
+          </div>
+          <div className="form-group">
+            <label className="form-label">SO I CAN BECOME</label>
+            <input
+              className="form-input"
+              placeholder="e.g. a consistent reader"
+              value={identity}
+              onChange={e => setIdentity(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">HABIT STATEMENT</label>
+            <div className="card" style={{ padding: 14, background: 'var(--surface2)', boxShadow: 'none' }}>
+              <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 6 }}>
+                Identity-first habit prompt inspired by Atomic Habits.
+              </div>
+              <div style={{ fontSize: 15, lineHeight: 1.5, color: 'var(--text)' }}>{statement}</div>
+            </div>
           </div>
           <div className="form-group">
             <label className="form-label">ICON</label>
@@ -76,7 +112,7 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
               ))}
             </div>
           </div>
-          <button type="submit" className="btn-primary">Add Habit</button>
+          <button type="submit" className="btn-primary" disabled={!canSubmit}>Add Habit</button>
         </form>
       </div>
     </div>

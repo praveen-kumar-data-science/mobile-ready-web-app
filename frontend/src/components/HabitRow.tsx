@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Flame, Check, Trash2 } from 'lucide-react';
-import { Habit } from '../types/habit';
+import { Habit, buildHabitStatement } from '../types/habit';
 import { computeStats } from '../services/habitAPI';
 
 interface HabitRowProps {
@@ -14,6 +14,9 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, today, onToggle, onDelete })
   const done = habit.completions.includes(today);
   const stats = computeStats(habit);
   const [popping, setPopping] = useState(false);
+  const habitStatement = habit.action && habit.cue && habit.identity
+    ? buildHabitStatement(habit.action, habit.cue, habit.identity)
+    : habit.description;
 
   const handleToggle = () => {
     if (!done) {
@@ -30,6 +33,7 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, today, onToggle, onDelete })
       </div>
       <div className="habit-info">
         <div className="habit-name">{habit.name}</div>
+        <div className="habit-meta">{habitStatement}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
           {stats.currentStreak > 0 && (
             <span className="streak-badge">
