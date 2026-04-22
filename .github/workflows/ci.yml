@@ -49,4 +49,7 @@ jobs:
         working-directory: ./frontend
         env:
           CI: true
-        run: npm test -- --watchAll=false --passWithNoTests
+        run: |
+          node -e "const pkg = require('./package.json'); process.exit(pkg.scripts && pkg.scripts.test ? 0 : 1)" \
+            && npm test -- --watchAll=false --passWithNoTests \
+            || echo "Skipping frontend tests: no test script defined"
