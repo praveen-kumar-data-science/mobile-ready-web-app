@@ -17,6 +17,15 @@ export const habitAPI = {
     if (!res.ok) throw new Error('Failed to create habit');
     return res.json();
   },
+  async updateHabit(id: number, data: Omit<Habit, 'id' | 'createdAt' | 'completions' | 'archived'>): Promise<Habit> {
+    const res = await fetch(`${API_BASE}/habits/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update habit');
+    return res.json();
+  },
   async deleteHabit(id: number): Promise<void> {
     const res = await fetch(`${API_BASE}/habits/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete habit');

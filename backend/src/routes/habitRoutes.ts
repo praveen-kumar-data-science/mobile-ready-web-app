@@ -51,7 +51,28 @@ export function setHabitRoutes(app: Express): void {
   // Update habit
   app.put('/api/habits/:id', (req: Request, res: Response) => {
     try {
-      const habit = habitService.updateHabit(parseInt(req.params.id), req.body);
+      const { name, description, frequency, color, emoji, action, cue, identity } = req.body;
+      const nextAction = String(action || name || '').trim();
+      const nextCue = String(cue || '').trim();
+      const nextIdentity = String(identity || '').trim();
+
+      if (!nextAction || !nextCue || !nextIdentity || !frequency || !color) {
+        res.status(400).json({ error: 'Action, time or location, identity, frequency, and color are required' });
+        return;
+      }
+
+      const nextDescription = String(description || `I will ${nextAction}, ${nextCue} so that I can become ${nextIdentity} I want to be.`).trim();
+
+      const habit = habitService.updateHabit(parseInt(req.params.id), {
+        name: String(name || nextAction).trim(),
+        description: nextDescription,
+        action: nextAction,
+        cue: nextCue,
+        identity: nextIdentity,
+        frequency,
+        color,
+        emoji: emoji || '🎯',
+      });
       if (habit) {
         res.status(200).json(habit);
       } else {

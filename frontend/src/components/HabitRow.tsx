@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, Check, Trash2 } from 'lucide-react';
+import { Flame, Check, Trash2, Pencil } from 'lucide-react';
 import { Habit, buildHabitStatement } from '../types/habit';
 import { computeStats } from '../services/habitAPI';
 
@@ -7,10 +7,11 @@ interface HabitRowProps {
   habit: Habit;
   today: string;
   onToggle: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
-const HabitRow: React.FC<HabitRowProps> = ({ habit, today, onToggle, onDelete }) => {
+const HabitRow: React.FC<HabitRowProps> = ({ habit, today, onToggle, onEdit, onDelete }) => {
   const done = habit.completions.includes(today);
   const stats = computeStats(habit);
   const [popping, setPopping] = useState(false);
@@ -50,12 +51,22 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, today, onToggle, onDelete })
       <div className={`habit-check ${popping ? 'pop' : ''}`}>
         {done && <Check size={16} color="white" strokeWidth={3} />}
       </div>
-      <button
-        onClick={e => { e.stopPropagation(); onDelete(); }}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', padding: 4 }}
-      >
-        <Trash2 size={16} />
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <button
+          onClick={e => { e.stopPropagation(); onEdit(); }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', padding: 4 }}
+          aria-label={`Edit ${habit.name}`}
+        >
+          <Pencil size={16} />
+        </button>
+        <button
+          onClick={e => { e.stopPropagation(); onDelete(); }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', padding: 4 }}
+          aria-label={`Delete ${habit.name}`}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 };

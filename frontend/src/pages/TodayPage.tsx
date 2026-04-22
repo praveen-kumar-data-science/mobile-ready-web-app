@@ -6,11 +6,12 @@ import HabitRow from '../components/HabitRow';
 interface TodayPageProps {
   habits: Habit[];
   onToggle: (id: number) => void;
+  onEdit: (habit: Habit) => void;
   onDelete: (id: number) => void;
   onAdd: () => void;
 }
 
-const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onDelete, onAdd }) => {
+const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelete, onAdd }) => {
   const [dateOffset, setDateOffset] = React.useState(0);
 
   const selectedDate = React.useMemo(() => {
@@ -101,6 +102,7 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onDelete, onAdd
               habit={h}
               today={selectedDate}
               onToggle={() => onToggle(h.id)}
+              onEdit={() => onEdit(h)}
               onDelete={() => onDelete(h.id)}
             />
           ))}

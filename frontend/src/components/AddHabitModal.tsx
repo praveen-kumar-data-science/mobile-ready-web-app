@@ -9,17 +9,18 @@ const FREQ: { value: 'daily' | 'weekly'; label: string }[] = [
 ];
 
 interface AddHabitModalProps {
-  onAdd: (h: Omit<Habit, 'id' | 'createdAt' | 'completions' | 'archived'>) => void;
+  initialHabit?: Habit;
+  onSubmit: (h: Omit<Habit, 'id' | 'createdAt' | 'completions' | 'archived'>) => void;
   onClose: () => void;
 }
 
-const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
-  const [action, setAction] = useState('');
-  const [cue, setCue] = useState('');
-  const [identity, setIdentity] = useState('');
-  const [emoji, setEmoji] = useState(EMOJIS[0]);
-  const [color, setColor] = useState(COLORS[0]);
-  const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
+const AddHabitModal: React.FC<AddHabitModalProps> = ({ initialHabit, onSubmit, onClose }) => {
+  const [action, setAction] = useState(initialHabit?.action ?? initialHabit?.name ?? '');
+  const [cue, setCue] = useState(initialHabit?.cue ?? '');
+  const [identity, setIdentity] = useState(initialHabit?.identity ?? '');
+  const [emoji, setEmoji] = useState(initialHabit?.emoji ?? EMOJIS[0]);
+  const [color, setColor] = useState(initialHabit?.color ?? COLORS[0]);
+  const [frequency, setFrequency] = useState<'daily' | 'weekly'>(initialHabit?.frequency ?? 'daily');
 
   const statement = buildHabitStatement(action || '<habit>', cue || '<time/location>', identity || '<type of person>');
   const canSubmit = !!action.trim() && !!cue.trim() && !!identity.trim();
@@ -32,7 +33,7 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
     const nextCue = cue.trim();
     const nextIdentity = identity.trim();
 
-    onAdd({
+    onSubmit({
       name: nextAction,
       description: buildHabitStatement(nextAction, nextCue, nextIdentity),
       action: nextAction,
@@ -49,7 +50,9 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-sheet" onClick={e => e.stopPropagation()}>
         <div className="modal-handle" />
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: 'var(--text)' }}>New Habit</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: 'var(--text)' }}>
+          {initialHabit ? 'Edit Habit' : 'New Habit'}
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">I WILL</label>
@@ -112,7 +115,9 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ onAdd, onClose }) => {
               ))}
             </div>
           </div>
-          <button type="submit" className="btn-primary" disabled={!canSubmit}>Add Habit</button>
+          <button type="submit" className="btn-primary" disabled={!canSubmit}>
+            {initialHabit ? 'Save Changes' : 'Add Habit'}
+          </button>
         </form>
       </div>
     </div>

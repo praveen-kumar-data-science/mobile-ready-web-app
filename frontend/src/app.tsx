@@ -13,6 +13,7 @@ const App: React.FC = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [activeTab, setActiveTab] = useState<TabId>('today');
   const [showAdd, setShowAdd] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) ?? 'light');
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +40,16 @@ const App: React.FC = () => {
     try {
       const h = await habitAPI.createHabit(data);
       setHabits(prev => [...prev, h]);
+      setShowAdd(false);
+    } catch (e) { console.error(e); }
+  };
+
+  const handleEditHabit = async (data: Omit<Habit, 'id' | 'createdAt' | 'completions' | 'archived'>) => {
+    if (!editingHabit) return;
+    try {
+      const updated = await habitAPI.updateHabit(editingHabit.id, data);
+      setHabits(prev => prev.map(h => h.id === updated.id ? updated : h));
+      setEditingHabit(null);
     } catch (e) { console.error(e); }
   };
 
@@ -84,6 +95,7 @@ const App: React.FC = () => {
           <TodayPage
             habits={habits}
             onToggle={handleToggle}
+            onEdit={habit => setEditingHabit(habit)}
             onDelete={handleDelete}
             onAdd={() => setShowAdd(true)}
           />
@@ -98,7 +110,15 @@ const App: React.FC = () => {
       <TabBar active={activeTab} onChange={setActiveTab} />
 
       {showAdd && (
-        <AddHabitModal onAdd={handleAddHabit} onClose={() => setShowAdd(false)} />
+        <AddHabitModal onSubmit={handleAddHabit} onClose={() => setShowAdd(false)} />
+      )}
+
+      {editingHabit && (
+        <AddHabitModal
+          initialHabit={editingHabit}
+          onSubmit={handleEditHabit}
+          onClose={() => setEditingHabit(null)}
+        />
       )}
     </div>
   );
