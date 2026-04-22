@@ -1,15 +1,20 @@
 import express from 'express';
-import { setRoutes } from './routes/index';
+import { setHabitRoutes } from './routes/habitRoutes';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Set up routes
-setRoutes(app);
+// Health check
+app.get('/health', (_req, res) => {
+    res.status(200).json({ status: "OK" });
+});
+
+// Habit routes
+setHabitRoutes(app);
 
 // Start the server
 app.listen(PORT, () => {

@@ -1,3 +1,5 @@
 import React from 'react';
 
-export const ComponentsReady: React.FC = () => null;
+export { default as HabitCard } from './HabitCard';
+export { default as HabitList } from './HabitList';
+export { default as AddHabitForm } from './AddHabitForm';
