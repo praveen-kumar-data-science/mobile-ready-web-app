@@ -9,6 +9,8 @@ import CalendarPage from './pages/CalendarPage';
 import StatsPage from './pages/StatsPage';
 import SettingsPage from './pages/SettingsPage';
 
+const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
+
 const App: React.FC = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [activeTab, setActiveTab] = useState<TabId>('today');
@@ -81,8 +83,8 @@ const App: React.FC = () => {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
         <div style={{ textAlign: 'center', color: 'var(--text2)' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚛️</div>
-          <div style={{ fontWeight: 600 }}>Loading Atoms...</div>
+          <img src={logoUrl} alt="Leader logo" className="loading-logo" />
+          <div style={{ fontWeight: 700, color: 'var(--text)', marginTop: 12 }}>Loading Leader...</div>
         </div>
       </div>
     );

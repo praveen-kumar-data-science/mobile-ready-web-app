@@ -3,6 +3,8 @@ import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Habit } from '../types/habit';
 import HabitRow from '../components/HabitRow';
 
+const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
+
 interface TodayPageProps {
   habits: Habit[];
   onToggle: (id: number) => void;
@@ -41,6 +43,13 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
   return (
     <div>
       <div className="page-header">
+        <div className="brand-inline">
+          <img src={logoUrl} alt="Leader logo" className="brand-inline-logo" />
+          <div>
+            <div className="brand-inline-name">Leader</div>
+            <div className="brand-inline-tag">Identity-first habit tracker</div>
+          </div>
+        </div>
         <h1>{greeting()}</h1>
         <p style={{ color: 'var(--text2)', marginTop: 2, fontSize: 15 }}>
           {completed}/{total} habits done

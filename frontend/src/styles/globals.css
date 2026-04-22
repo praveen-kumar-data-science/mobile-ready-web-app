@@ -50,6 +50,13 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
+.loading-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  box-shadow: 0 18px 36px rgba(18,44,99,0.22);
+}
+
 /* App shell */
 .app-shell {
   display: flex;
@@ -112,6 +119,27 @@ html, body, #root {
 /* Page header */
 .page-header {
   padding: 56px 20px 16px;
+}
+.brand-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.brand-inline-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(18,44,99,0.18);
+}
+.brand-inline-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.brand-inline-tag {
+  font-size: 12px;
+  color: var(--text2);
 }
 .page-header h1 {
   font-size: 32px;
