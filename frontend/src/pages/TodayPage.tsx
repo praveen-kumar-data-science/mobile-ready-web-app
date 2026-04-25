@@ -7,7 +7,7 @@ const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
 
 interface TodayPageProps {
   habits: Habit[];
-  onToggle: (id: number) => void;
+  onToggle: (id: number, date: string) => void;
   onEdit: (habit: Habit) => void;
   onDelete: (id: number) => void;
   onAdd: () => void;
@@ -110,7 +110,7 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
               key={h.id}
               habit={h}
               today={selectedDate}
-              onToggle={() => onToggle(h.id)}
+              onToggle={() => onToggle(h.id, selectedDate)}
               onEdit={() => onEdit(h)}
               onDelete={() => onDelete(h.id)}
             />

@@ -55,16 +55,15 @@ const App: React.FC = () => {
     } catch (e) { console.error(e); }
   };
 
-  const handleToggle = async (id: number) => {
-    const today = new Date().toISOString().split('T')[0];
+  const handleToggle = async (id: number, date: string) => {
     const habit = habits.find(h => h.id === id);
     if (!habit) return;
     try {
       let updated: Habit;
-      if (habit.completions.includes(today)) {
-        updated = await habitAPI.removeCompletion(id, today);
+      if (habit.completions.includes(date)) {
+        updated = await habitAPI.removeCompletion(id, date);
       } else {
-        updated = await habitAPI.logCompletion(id, today);
+        updated = await habitAPI.logCompletion(id, date);
       }
       setHabits(prev => prev.map(h => h.id === id ? updated : h));
     } catch (e) { console.error(e); }
