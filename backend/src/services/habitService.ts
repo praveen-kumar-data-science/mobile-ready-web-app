@@ -9,6 +9,8 @@ export interface Habit {
   action: string;
   cue: string;
   identity: string;
+  reminderTime?: string;
+  reminderMessage?: string;
   frequency: 'daily' | 'weekly';
   color: string;
   emoji: string;

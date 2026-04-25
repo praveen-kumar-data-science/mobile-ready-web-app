@@ -10,6 +10,7 @@ import StatsPage from './pages/StatsPage';
 import SettingsPage from './pages/SettingsPage';
 
 const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
+const notificationKeyPrefix = 'leader-reminder-sent';
 
 const App: React.FC = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -17,6 +18,7 @@ const App: React.FC = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) ?? 'light');
+  const [notificationPermission, setNotificationPermission] = useState<string>(() => typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
   const [loading, setLoading] = useState(true);
 
   // Apply theme to document
@@ -24,6 +26,33 @@ const App: React.FC = () => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (typeof Notification === 'undefined' || notificationPermission !== 'granted') return;
+
+    const now = new Date();
+    const timers = habits
+      .filter(habit => habit.reminderTime && !habit.completions.includes(now.toISOString().split('T')[0]))
+      .map(habit => {
+        const [hours, minutes] = (habit.reminderTime ?? '').split(':').map(Number);
+        const scheduledAt = new Date();
+        scheduledAt.setHours(hours || 0, minutes || 0, 0, 0);
+
+        const todayKey = `${notificationKeyPrefix}-${habit.id}-${scheduledAt.toISOString().split('T')[0]}`;
+        if (Number.isNaN(scheduledAt.getTime()) || scheduledAt <= now || localStorage.getItem(todayKey)) return null;
+
+        return window.setTimeout(() => {
+          new Notification(habit.name, {
+            body: habit.reminderMessage || habit.description,
+            icon: logoUrl,
+          });
+          localStorage.setItem(todayKey, '1');
+        }, scheduledAt.getTime() - now.getTime());
+      })
+      .filter((timer): timer is number => timer !== null);
+
+    return () => timers.forEach(window.clearTimeout);
+  }, [habits, notificationPermission]);
 
   const loadHabits = useCallback(async () => {
     try {
@@ -76,6 +105,31 @@ const App: React.FC = () => {
     } catch (e) { console.error(e); }
   };
 
+  const requestNotifications = async () => {
+    if (typeof Notification === 'undefined') {
+      setNotificationPermission('unsupported');
+      return;
+    }
+    const result = await Notification.requestPermission();
+    setNotificationPermission(result);
+  };
+
+  const shareApp = async () => {
+    const shareData = {
+      title: 'Leader Habit Tracker',
+      text: 'Build identity-based habits and track your progress.',
+      url: 'https://praveen-kumar-data-science.github.io/mobile-ready-web-app/',
+    };
+
+    if (navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+
+    await navigator.clipboard.writeText(shareData.url);
+    window.alert('App link copied to clipboard.');
+  };
+
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   if (loading) {
@@ -104,7 +158,14 @@ const App: React.FC = () => {
         {activeTab === 'calendar' && <CalendarPage habits={habits} />}
         {activeTab === 'stats' && <StatsPage habits={habits} />}
         {activeTab === 'settings' && (
-          <SettingsPage theme={theme} onToggleTheme={toggleTheme} habitsCount={habits.length} />
+          <SettingsPage
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            habitsCount={habits.length}
+            notificationPermission={notificationPermission}
+            onRequestNotifications={requestNotifications}
+            onShareApp={shareApp}
+          />
         )}
       </div>
 

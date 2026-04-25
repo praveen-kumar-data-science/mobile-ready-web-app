@@ -6,9 +6,12 @@ interface SettingsPageProps {
   theme: Theme;
   onToggleTheme: () => void;
   habitsCount: number;
+  notificationPermission: string;
+  onRequestNotifications: () => void;
+  onShareApp: () => void;
 }
 
-const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habitsCount }) => {
+const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habitsCount, notificationPermission, onRequestNotifications, onShareApp }) => {
   return (
     <div>
       <div className="page-header">
@@ -31,6 +34,15 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habit
             <span className="toggle-slider" />
           </label>
         </div>
+        <button className="settings-row settings-button" onClick={onRequestNotifications}>
+          <div className="settings-row-label">
+            <div className="settings-row-icon" style={{ background: '#eef6ff' }}>
+              <Bell size={16} color="#3C8DFF" />
+            </div>
+            Habit Reminders
+          </div>
+          <span style={{ color: 'var(--text3)', fontSize: 14, textTransform: 'capitalize' }}>{notificationPermission}</span>
+        </button>
       </div>
 
       {/* About */}
@@ -54,7 +66,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habit
           </div>
           <span style={{ color: 'var(--text3)', fontSize: 14 }}>{habitsCount}</span>
         </div>
-        <div className="settings-row">
+        <button className="settings-row settings-button" onClick={onShareApp}>
           <div className="settings-row-label">
             <div className="settings-row-icon" style={{ background: '#dfe6e9' }}>
               <Share2 size={16} color="#636e72" />
@@ -62,7 +74,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habit
             Share App
           </div>
           <ChevronRight size={16} color="var(--text3)" />
-        </div>
+        </button>
       </div>
 
       {/* Tips */}
@@ -82,7 +94,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habit
       </div>
 
       <div style={{ textAlign: 'center', padding: '24px 16px', color: 'var(--text3)', fontSize: 13 }}>
-        Atoms Habit Tracker · Built with ❤️
+        Leader · Built around the Atomic Habits mindset
       </div>
     </div>
   );

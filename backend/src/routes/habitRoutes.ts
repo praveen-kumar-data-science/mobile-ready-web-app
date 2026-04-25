@@ -20,7 +20,7 @@ export function setHabitRoutes(app: Express): void {
   // Create habit
   app.post('/api/habits', (req: Request, res: Response) => {
     try {
-      const { name, description, frequency, color, emoji, action, cue, identity } = req.body;
+      const { name, description, frequency, color, emoji, action, cue, identity, reminderTime, reminderMessage } = req.body;
       const nextAction = String(action || name || '').trim();
       const nextCue = String(cue || '').trim();
       const nextIdentity = String(identity || '').trim();
@@ -38,6 +38,8 @@ export function setHabitRoutes(app: Express): void {
         action: nextAction,
         cue: nextCue,
         identity: nextIdentity,
+        reminderTime: reminderTime || undefined,
+        reminderMessage: reminderMessage || undefined,
         frequency,
         color,
         emoji: emoji || '🎯',
@@ -51,7 +53,7 @@ export function setHabitRoutes(app: Express): void {
   // Update habit
   app.put('/api/habits/:id', (req: Request, res: Response) => {
     try {
-      const { name, description, frequency, color, emoji, action, cue, identity } = req.body;
+      const { name, description, frequency, color, emoji, action, cue, identity, reminderTime, reminderMessage } = req.body;
       const nextAction = String(action || name || '').trim();
       const nextCue = String(cue || '').trim();
       const nextIdentity = String(identity || '').trim();
@@ -69,6 +71,8 @@ export function setHabitRoutes(app: Express): void {
         action: nextAction,
         cue: nextCue,
         identity: nextIdentity,
+        reminderTime: reminderTime || undefined,
+        reminderMessage: reminderMessage || undefined,
         frequency,
         color,
         emoji: emoji || '🎯',

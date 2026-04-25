@@ -5,6 +5,8 @@ export interface Habit {
   action: string;
   cue: string;
   identity: string;
+  reminderTime?: string;
+  reminderMessage?: string;
   frequency: 'daily' | 'weekly';
   weekDays?: number[]; // 0=Sun..6=Sat for weekly habits
   color: string;

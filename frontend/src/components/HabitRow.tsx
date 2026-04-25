@@ -41,6 +41,9 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, today, onToggle, onEdit, onD
               <Flame size={11} /> {stats.currentStreak}d
             </span>
           )}
+          {habit.reminderTime && (
+            <span className="reminder-badge">⏰ {habit.reminderTime}</span>
+          )}
           <div className="week-dots">
             {stats.weeklyData.map((w, i) => (
               <div key={i} className={`week-dot ${w.completed ? 'done' : ''}`} />

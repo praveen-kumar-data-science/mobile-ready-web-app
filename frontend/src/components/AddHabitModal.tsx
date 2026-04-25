@@ -18,6 +18,8 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ initialHabit, onSubmit, o
   const [action, setAction] = useState(initialHabit?.action ?? initialHabit?.name ?? '');
   const [cue, setCue] = useState(initialHabit?.cue ?? '');
   const [identity, setIdentity] = useState(initialHabit?.identity ?? '');
+  const [reminderTime, setReminderTime] = useState(initialHabit?.reminderTime ?? '');
+  const [reminderMessage, setReminderMessage] = useState(initialHabit?.reminderMessage ?? '');
   const [emoji, setEmoji] = useState(initialHabit?.emoji ?? EMOJIS[0]);
   const [color, setColor] = useState(initialHabit?.color ?? COLORS[0]);
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>(initialHabit?.frequency ?? 'daily');
@@ -39,6 +41,8 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ initialHabit, onSubmit, o
       action: nextAction,
       cue: nextCue,
       identity: nextIdentity,
+      reminderTime: reminderTime || undefined,
+      reminderMessage: reminderMessage.trim() || undefined,
       emoji,
       color,
       frequency,
@@ -114,6 +118,24 @@ const AddHabitModal: React.FC<AddHabitModalProps> = ({ initialHabit, onSubmit, o
                 <button type="button" key={f.value} className={`freq-chip ${frequency === f.value ? 'selected' : ''}`} onClick={() => setFrequency(f.value)}>{f.label}</button>
               ))}
             </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">REMINDER TIME (optional)</label>
+            <input
+              className="form-input"
+              type="time"
+              value={reminderTime}
+              onChange={e => setReminderTime(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">REMINDER NOTE (optional)</label>
+            <input
+              className="form-input"
+              placeholder="e.g. Tiny changes, remarkable results"
+              value={reminderMessage}
+              onChange={e => setReminderMessage(e.target.value)}
+            />
           </div>
           <button type="submit" className="btn-primary" disabled={!canSubmit}>
             {initialHabit ? 'Save Changes' : 'Add Habit'}

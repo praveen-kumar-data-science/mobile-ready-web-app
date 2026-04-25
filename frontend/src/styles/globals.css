@@ -234,6 +234,19 @@ html, body, #root {
 }
 [data-theme="dark"] .streak-badge { background: #2a1f0a; }
 
+.reminder-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3c8dff;
+  background: #eaf3ff;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+[data-theme="dark"] .reminder-badge { background: #17304f; }
+
 /* Progress bar */
 .progress-wrap { padding: 0 16px 16px; }
 .progress-bar-bg {
@@ -292,6 +305,36 @@ html, body, #root {
 }
 .stat-chip-value { font-size: 26px; font-weight: 700; color: var(--text); }
 .stat-chip-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.lesson-card {
+  margin: 0 16px 16px;
+  background: linear-gradient(135deg, #fff3d8, #ffe7c1);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+[data-theme="dark"] .lesson-card {
+  background: linear-gradient(135deg, #332814, #231c11);
+}
+.lesson-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+.lesson-card p {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.lesson-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b76a16;
+  margin-bottom: 8px;
+}
 
 /* Calendar heatmap */
 .heatmap-grid {
@@ -365,6 +408,12 @@ html, body, #root {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   cursor: pointer;
+}
+.settings-button {
+  width: 100%;
+  border: none;
+  text-align: left;
+  font: inherit;
 }
 .settings-row:first-child { border-radius: var(--radius) var(--radius) 0 0; }
 .settings-row:last-child { border-bottom: none; border-radius: 0 0 var(--radius) var(--radius); }

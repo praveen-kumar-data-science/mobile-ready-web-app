@@ -2,6 +2,7 @@ import React from 'react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Habit } from '../types/habit';
 import HabitRow from '../components/HabitRow';
+import { getDailyLesson } from '../data/dailyLessons';
 
 const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
 
@@ -39,6 +40,8 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
     if (h < 17) return 'Good afternoon ☀️';
     return 'Good evening 🌙';
   };
+
+  const lesson = React.useMemo(() => getDailyLesson(selectedDate), [selectedDate]);
 
   return (
     <div>
@@ -86,6 +89,13 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
           </div>
         </div>
       )}
+
+      <div className="section-title">DAILY LESSON</div>
+      <div className="lesson-card">
+        <div className="lesson-kicker">Inspired by Atomic Habits</div>
+        <h3>{lesson.title}</h3>
+        <p>{lesson.body}</p>
+      </div>
 
       {/* Completion banner */}
       {total > 0 && pct === 100 && (
