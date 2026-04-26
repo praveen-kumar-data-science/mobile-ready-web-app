@@ -1,0 +1,34 @@
+{
+  "name": "Leader - Habit Tracker",
+  "short_name": "Leader",
+  "description": "Build identity-based habits, prevent self-sabotage, and execute your business strategy.",
+  "start_url": "/mobile-ready-web-app/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#122C63",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Kumar Praveen.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/Kumar Praveen.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Kumar Praveen.jpg",
+      "sizes": "540x720",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "screenshots_alt": "Leader habit tracker interface showing daily habits, streaks, and business milestones"
+}
