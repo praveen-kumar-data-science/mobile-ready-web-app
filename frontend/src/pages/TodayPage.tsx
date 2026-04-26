@@ -3,6 +3,7 @@ import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Habit } from '../types/habit';
 import HabitRow from '../components/HabitRow';
 import { getDailyLesson } from '../data/dailyLessons';
+import { getAntiSabotageStrategy, getBusinessBuilderStrategy } from '../data/growthStrategies';
 
 const logoUrl = `${import.meta.env.BASE_URL}Kumar Praveen.jpg`;
 
@@ -42,6 +43,8 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
   };
 
   const lesson = React.useMemo(() => getDailyLesson(selectedDate), [selectedDate]);
+  const antiSabotageStrategy = React.useMemo(() => getAntiSabotageStrategy(selectedDate), [selectedDate]);
+  const businessStrategy = React.useMemo(() => getBusinessBuilderStrategy(selectedDate), [selectedDate]);
 
   return (
     <div>
@@ -95,6 +98,22 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
         <div className="lesson-kicker">Inspired by Atomic Habits</div>
         <h3>{lesson.title}</h3>
         <p>{lesson.body}</p>
+      </div>
+
+      <div className="section-title">ANTI-SELF-SABOTAGE</div>
+      <div className="strategy-card strategy-card--mindset">
+        <div className="lesson-kicker">Awaken The Giant Inspired</div>
+        <h3>{antiSabotageStrategy.title}</h3>
+        <p>{antiSabotageStrategy.why}</p>
+        <div className="strategy-action">Action: {antiSabotageStrategy.action}</div>
+      </div>
+
+      <div className="section-title">BUSINESS BUILDER STRATEGY</div>
+      <div className="strategy-card strategy-card--business">
+        <div className="lesson-kicker">Founder Focus</div>
+        <h3>{businessStrategy.title}</h3>
+        <p>{businessStrategy.why}</p>
+        <div className="strategy-action">Action: {businessStrategy.action}</div>
       </div>
 
       {/* Completion banner */}

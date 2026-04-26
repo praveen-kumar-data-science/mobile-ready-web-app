@@ -336,6 +336,50 @@ html, body, #root {
   margin-bottom: 8px;
 }
 
+.strategy-card {
+  margin: 0 16px 16px;
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.strategy-card--mindset {
+  background: linear-gradient(135deg, #dff5ff, #c5ecff);
+}
+.strategy-card--business {
+  background: linear-gradient(135deg, #e5ffd8, #d2f7be);
+}
+[data-theme="dark"] .strategy-card--mindset {
+  background: linear-gradient(135deg, #122734, #173244);
+}
+[data-theme="dark"] .strategy-card--business {
+  background: linear-gradient(135deg, #1e3216, #28441d);
+}
+.strategy-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+.strategy-card p {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.strategy-action {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+[data-theme="dark"] .strategy-action {
+  background: rgba(0,0,0,0.25);
+  border-color: rgba(255,255,255,0.12);
+}
+
 /* Calendar heatmap */
 .heatmap-grid {
   display: grid;

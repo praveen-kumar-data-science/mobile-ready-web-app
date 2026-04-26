@@ -1,6 +1,7 @@
 import React from 'react';
 import { Moon, Sun, Bell, Info, ChevronRight, Star, Share2 } from 'lucide-react';
 import { Theme } from '../types/habit';
+import { getBusinessBuilderPlaybook } from '../data/growthStrategies';
 
 interface SettingsPageProps {
   theme: Theme;
@@ -12,6 +13,8 @@ interface SettingsPageProps {
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habitsCount, notificationPermission, onRequestNotifications, onShareApp }) => {
+  const businessPlaybook = React.useMemo(() => getBusinessBuilderPlaybook().slice(0, 8), []);
+
   return (
     <div>
       <div className="page-header">
@@ -93,8 +96,21 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habit
         ))}
       </div>
 
+      <div className="section-title">BUSINESS BUILDER PLAYBOOK</div>
+      <div style={{ margin: '0 16px', background: 'var(--surface)', borderRadius: 'var(--radius)', padding: '16px', boxShadow: 'var(--shadow)' }}>
+        {businessPlaybook.map((item, i) => (
+          <div key={item.title} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < businessPlaybook.length - 1 ? '1px solid var(--border)' : 'none' }}>
+            <span style={{ fontSize: 20 }}>💼</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{item.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--text2)', marginTop: 4, lineHeight: 1.4 }}>{item.action}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div style={{ textAlign: 'center', padding: '24px 16px', color: 'var(--text3)', fontSize: 13 }}>
-        Leader · Built around the Atomic Habits mindset
+        Leader · Built for identity habits, anti-self-sabotage, and business growth
       </div>
     </div>
   );
