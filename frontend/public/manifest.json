@@ -2,7 +2,7 @@
   "name": "Leader - Habit Tracker",
   "short_name": "Leader",
   "description": "Build identity-based habits, prevent self-sabotage, and execute your business strategy.",
-  "start_url": "/mobile-ready-web-app/",
+  "start_url": "/Leader/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#122C63",
