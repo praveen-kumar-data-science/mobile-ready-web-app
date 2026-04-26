@@ -380,6 +380,25 @@ html, body, #root {
   border-color: rgba(255,255,255,0.12);
 }
 
+.strategy-footer-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mini-action-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  background: #f97316;
+  cursor: pointer;
+}
+
 /* Calendar heatmap */
 .heatmap-grid {
   display: grid;

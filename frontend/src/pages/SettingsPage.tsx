@@ -1,6 +1,6 @@
 import React from 'react';
 import { Moon, Sun, Bell, Info, ChevronRight, Star, Share2 } from 'lucide-react';
-import { Theme } from '../types/habit';
+import { Theme, Habit, BusinessMilestone, WeeklyCEOReview } from '../types/habit';
 import { getBusinessBuilderPlaybook } from '../data/growthStrategies';
 
 interface SettingsPageProps {
@@ -10,10 +10,58 @@ interface SettingsPageProps {
   notificationPermission: string;
   onRequestNotifications: () => void;
   onShareApp: () => void;
+  habits: Habit[];
+  milestones: BusinessMilestone[];
+  onAddMilestone: (title: string, targetDate: string, linkedHabitId?: number) => void;
+  onToggleMilestone: (id: number) => void;
+  onSaveWeeklyReview: (review: Omit<WeeklyCEOReview, 'weekStart'>) => void;
+  latestReview: WeeklyCEOReview | null;
 }
 
-const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habitsCount, notificationPermission, onRequestNotifications, onShareApp }) => {
+const SettingsPage: React.FC<SettingsPageProps> = ({
+  theme,
+  onToggleTheme,
+  habitsCount,
+  notificationPermission,
+  onRequestNotifications,
+  onShareApp,
+  habits,
+  milestones,
+  onAddMilestone,
+  onToggleMilestone,
+  onSaveWeeklyReview,
+  latestReview,
+}) => {
   const businessPlaybook = React.useMemo(() => getBusinessBuilderPlaybook().slice(0, 8), []);
+  const [milestoneTitle, setMilestoneTitle] = React.useState('');
+  const [milestoneDate, setMilestoneDate] = React.useState('');
+  const [linkedHabitId, setLinkedHabitId] = React.useState<number | undefined>(undefined);
+
+  const [salesExecution, setSalesExecution] = React.useState(latestReview?.salesExecution ?? 6);
+  const [leadGeneration, setLeadGeneration] = React.useState(latestReview?.leadGeneration ?? 6);
+  const [deepWork, setDeepWork] = React.useState(latestReview?.deepWork ?? 6);
+  const [delivery, setDelivery] = React.useState(latestReview?.delivery ?? 6);
+  const [mindset, setMindset] = React.useState(latestReview?.mindset ?? 6);
+  const [reviewNotes, setReviewNotes] = React.useState(latestReview?.notes ?? '');
+
+  const submitMilestone = () => {
+    if (!milestoneTitle.trim() || !milestoneDate) return;
+    onAddMilestone(milestoneTitle, milestoneDate, linkedHabitId);
+    setMilestoneTitle('');
+    setMilestoneDate('');
+    setLinkedHabitId(undefined);
+  };
+
+  const saveReview = () => {
+    onSaveWeeklyReview({
+      salesExecution,
+      leadGeneration,
+      deepWork,
+      delivery,
+      mindset,
+      notes: reviewNotes.trim(),
+    });
+  };
 
   return (
     <div>
@@ -107,6 +155,88 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onToggleTheme, habit
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="section-title">BUSINESS MILESTONE TRACKER</div>
+      <div style={{ margin: '0 16px', background: 'var(--surface)', borderRadius: 'var(--radius)', padding: '16px', boxShadow: 'var(--shadow)' }}>
+        <input
+          className="form-input"
+          placeholder="Milestone title (ex: close first 5 paying clients)"
+          value={milestoneTitle}
+          onChange={e => setMilestoneTitle(e.target.value)}
+        />
+        <div style={{ height: 8 }} />
+        <input className="form-input" type="date" value={milestoneDate} onChange={e => setMilestoneDate(e.target.value)} />
+        <div style={{ height: 8 }} />
+        <select className="form-input" value={linkedHabitId ?? ''} onChange={e => setLinkedHabitId(e.target.value ? Number(e.target.value) : undefined)}>
+          <option value="">Link to habit (optional)</option>
+          {habits.map(h => (
+            <option key={h.id} value={h.id}>{h.emoji} {h.name}</option>
+          ))}
+        </select>
+        <button className="btn-primary" onClick={submitMilestone}>Add Milestone</button>
+
+        <div style={{ marginTop: 12 }}>
+          {milestones.length === 0 ? (
+            <p style={{ fontSize: 14, color: 'var(--text2)' }}>No milestones yet. Add your first business target.</p>
+          ) : (
+            milestones.slice(0, 8).map((m, i) => (
+              <button
+                key={m.id}
+                onClick={() => onToggleMilestone(m.id)}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  border: '1px solid var(--border)',
+                  background: m.status === 'completed' ? 'var(--green-light)' : 'var(--surface2)',
+                  borderRadius: 10,
+                  padding: '10px 12px',
+                  marginTop: i === 0 ? 0 : 8,
+                  cursor: 'pointer',
+                }}
+              >
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{m.title}</div>
+                <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 3 }}>
+                  Target: {m.targetDate} · Status: {m.status === 'completed' ? 'Completed' : 'Planned'}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="section-title">WEEKLY CEO REVIEW</div>
+      <div style={{ margin: '0 16px', background: 'var(--surface)', borderRadius: 'var(--radius)', padding: '16px', boxShadow: 'var(--shadow)' }}>
+        {[
+          { label: 'Sales Execution', value: salesExecution, set: setSalesExecution },
+          { label: 'Lead Generation', value: leadGeneration, set: setLeadGeneration },
+          { label: 'Deep Work Focus', value: deepWork, set: setDeepWork },
+          { label: 'Delivery Quality', value: delivery, set: setDelivery },
+          { label: 'Mindset & Discipline', value: mindset, set: setMindset },
+        ].map(item => (
+          <div key={item.label} style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 13, color: 'var(--text2)' }}>{item.label}</span>
+              <span style={{ fontSize: 13, color: 'var(--text)', fontWeight: 600 }}>{item.value}/10</span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              value={item.value}
+              onChange={e => item.set(Number(e.target.value))}
+              style={{ width: '100%' }}
+            />
+          </div>
+        ))}
+        <textarea
+          className="form-input"
+          style={{ minHeight: 80, resize: 'vertical' }}
+          placeholder="Weekly reflection: wins, bottlenecks, next strategic move"
+          value={reviewNotes}
+          onChange={e => setReviewNotes(e.target.value)}
+        />
+        <button className="btn-primary" onClick={saveReview}>Save Weekly Review</button>
       </div>
 
       <div style={{ textAlign: 'center', padding: '24px 16px', color: 'var(--text3)', fontSize: 13 }}>

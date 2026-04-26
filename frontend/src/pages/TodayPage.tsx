@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Habit } from '../types/habit';
+import { Habit, SelfSabotageEntry } from '../types/habit';
 import HabitRow from '../components/HabitRow';
 import { getDailyLesson } from '../data/dailyLessons';
 import { getAntiSabotageStrategy, getBusinessBuilderStrategy } from '../data/growthStrategies';
@@ -13,9 +13,11 @@ interface TodayPageProps {
   onEdit: (habit: Habit) => void;
   onDelete: (id: number) => void;
   onAdd: () => void;
+  triggerEntries: SelfSabotageEntry[];
+  onLogSelfSabotage: (entry: Omit<SelfSabotageEntry, 'id' | 'date'>) => void;
 }
 
-const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelete, onAdd }) => {
+const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelete, onAdd, triggerEntries, onLogSelfSabotage }) => {
   const [dateOffset, setDateOffset] = React.useState(0);
 
   const selectedDate = React.useMemo(() => {
@@ -45,6 +47,24 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
   const lesson = React.useMemo(() => getDailyLesson(selectedDate), [selectedDate]);
   const antiSabotageStrategy = React.useMemo(() => getAntiSabotageStrategy(selectedDate), [selectedDate]);
   const businessStrategy = React.useMemo(() => getBusinessBuilderStrategy(selectedDate), [selectedDate]);
+  const todayTriggers = React.useMemo(() => triggerEntries.filter(e => e.date === selectedDate).length, [triggerEntries, selectedDate]);
+
+  const handleLogTrigger = () => {
+    const trigger = window.prompt('What triggered the self-sabotage urge?');
+    if (!trigger || !trigger.trim()) return;
+
+    const pattern = window.prompt('Pattern type (fear, perfectionism, distraction, overwhelm, doubt):', 'distraction') ?? 'distraction';
+    const intensityRaw = window.prompt('Intensity (1-10):', '5') ?? '5';
+    const intensity = Math.min(10, Math.max(1, Number(intensityRaw) || 5));
+    const resetAction = window.prompt('What is your recovery action right now?', 'Do a focused 10-minute sprint.') ?? 'Do a focused 10-minute sprint.';
+
+    onLogSelfSabotage({
+      trigger: trigger.trim(),
+      pattern: pattern.trim() || 'distraction',
+      intensity,
+      resetAction: resetAction.trim() || 'Do a focused 10-minute sprint.',
+    });
+  };
 
   return (
     <div>
@@ -106,6 +126,10 @@ const TodayPage: React.FC<TodayPageProps> = ({ habits, onToggle, onEdit, onDelet
         <h3>{antiSabotageStrategy.title}</h3>
         <p>{antiSabotageStrategy.why}</p>
         <div className="strategy-action">Action: {antiSabotageStrategy.action}</div>
+        <div className="strategy-footer-row">
+          <span style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 600 }}>Triggers logged today: {todayTriggers}</span>
+          <button className="mini-action-btn" onClick={handleLogTrigger}>Log Trigger</button>
+        </div>
       </div>
 
       <div className="section-title">BUSINESS BUILDER STRATEGY</div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './styles/globals.css';
-import { Habit, TabId, Theme } from './types/habit';
+import { Habit, TabId, Theme, SelfSabotageEntry, BusinessMilestone, WeeklyCEOReview } from './types/habit';
 import { habitAPI } from './services/habitAPI';
+import { getWeekStartISO, loadCEOReviews, loadMilestones, loadTriggerEntries, saveCEOReviews, saveMilestones, saveTriggerEntries } from './services/growthCoachStorage';
 import TabBar from './components/TabBar';
 import AddHabitModal from './components/AddHabitModal';
 import TodayPage from './pages/TodayPage';
@@ -19,6 +20,9 @@ const App: React.FC = () => {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) ?? 'light');
   const [notificationPermission, setNotificationPermission] = useState<string>(() => typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
+  const [triggerEntries, setTriggerEntries] = useState<SelfSabotageEntry[]>(() => loadTriggerEntries());
+  const [milestones, setMilestones] = useState<BusinessMilestone[]>(() => loadMilestones());
+  const [ceoReviews, setCeoReviews] = useState<WeeklyCEOReview[]>(() => loadCEOReviews());
   const [loading, setLoading] = useState(true);
 
   // Apply theme to document
@@ -26,6 +30,18 @@ const App: React.FC = () => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    saveTriggerEntries(triggerEntries);
+  }, [triggerEntries]);
+
+  useEffect(() => {
+    saveMilestones(milestones);
+  }, [milestones]);
+
+  useEffect(() => {
+    saveCEOReviews(ceoReviews);
+  }, [ceoReviews]);
 
   useEffect(() => {
     if (typeof Notification === 'undefined' || notificationPermission !== 'granted') return;
@@ -132,6 +148,59 @@ const App: React.FC = () => {
 
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
+  const logSelfSabotageTrigger = (entry: Omit<SelfSabotageEntry, 'id' | 'date'>) => {
+    const today = new Date().toISOString().split('T')[0];
+    setTriggerEntries(prev => [
+      {
+        id: Date.now(),
+        date: today,
+        ...entry,
+      },
+      ...prev,
+    ]);
+  };
+
+  const addMilestone = (title: string, targetDate: string, linkedHabitId?: number) => {
+    if (!title.trim() || !targetDate) return;
+    setMilestones(prev => [
+      {
+        id: Date.now(),
+        title: title.trim(),
+        targetDate,
+        linkedHabitId,
+        status: 'planned',
+        createdAt: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  };
+
+  const toggleMilestone = (id: number) => {
+    setMilestones(prev => prev.map(m => {
+      if (m.id !== id) return m;
+      if (m.status === 'completed') {
+        return { ...m, status: 'planned', completedAt: undefined };
+      }
+      return { ...m, status: 'completed', completedAt: new Date().toISOString() };
+    }));
+  };
+
+  const saveWeeklyReview = (review: Omit<WeeklyCEOReview, 'weekStart'>) => {
+    const weekStart = getWeekStartISO();
+    setCeoReviews(prev => {
+      const next = [...prev];
+      const idx = next.findIndex(r => r.weekStart === weekStart);
+      const payload: WeeklyCEOReview = { weekStart, ...review };
+      if (idx >= 0) {
+        next[idx] = payload;
+        return next;
+      }
+      return [payload, ...next];
+    });
+  };
+
+  const latestReview = ceoReviews[0] ?? null;
+
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
@@ -153,10 +222,12 @@ const App: React.FC = () => {
             onEdit={habit => setEditingHabit(habit)}
             onDelete={handleDelete}
             onAdd={() => setShowAdd(true)}
+            triggerEntries={triggerEntries}
+            onLogSelfSabotage={logSelfSabotageTrigger}
           />
         )}
         {activeTab === 'calendar' && <CalendarPage habits={habits} />}
-        {activeTab === 'stats' && <StatsPage habits={habits} />}
+        {activeTab === 'stats' && <StatsPage habits={habits} triggerEntries={triggerEntries} milestones={milestones} latestReview={latestReview} />}
         {activeTab === 'settings' && (
           <SettingsPage
             theme={theme}
@@ -165,6 +236,12 @@ const App: React.FC = () => {
             notificationPermission={notificationPermission}
             onRequestNotifications={requestNotifications}
             onShareApp={shareApp}
+            habits={habits}
+            milestones={milestones}
+            onAddMilestone={addMilestone}
+            onToggleMilestone={toggleMilestone}
+            onSaveWeeklyReview={saveWeeklyReview}
+            latestReview={latestReview}
           />
         )}
       </div>
