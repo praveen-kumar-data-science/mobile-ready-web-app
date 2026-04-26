@@ -9,7 +9,7 @@ import CalendarPage from './pages/CalendarPage';
 import StatsPage from './pages/StatsPage';
 import SettingsPage from './pages/SettingsPage';
 
-const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
+const logoUrl = `${import.meta.env.BASE_URL}Kumar Praveen.jpg`;
 const notificationKeyPrefix = 'leader-reminder-sent';
 
 const App: React.FC = () => {

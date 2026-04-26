@@ -4,7 +4,7 @@ import { Habit } from '../types/habit';
 import HabitRow from '../components/HabitRow';
 import { getDailyLesson } from '../data/dailyLessons';
 
-const logoUrl = `${import.meta.env.BASE_URL}leader-logo.svg`;
+const logoUrl = `${import.meta.env.BASE_URL}Kumar Praveen.jpg`;
 
 interface TodayPageProps {
   habits: Habit[];
