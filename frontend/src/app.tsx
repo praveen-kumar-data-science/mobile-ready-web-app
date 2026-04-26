@@ -134,7 +134,7 @@ const App: React.FC = () => {
     const shareData = {
       title: 'Leader Habit Tracker',
       text: 'Build identity-based habits and track your progress.',
-      url: 'https://praveen-kumar-data-science.github.io/Leader/',
+      url: 'https://praveen-kumar-data-science.github.io/mobile-ready-web-app/',
     };
 
     if (navigator.share) {

@@ -19,7 +19,7 @@
   <script type="module" src="/src/index.tsx"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/Leader/' }).catch(err => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/mobile-ready-web-app/' }).catch(err => {
         console.log('Service Worker registration failed:', err);
       });
     }

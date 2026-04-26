@@ -3,8 +3,8 @@ const CACHE_ASSETS = CACHE_VERSION + '-assets';
 const CACHE_DATA = CACHE_VERSION + '-data';
 
 const urlsToCache = [
-  '/Leader/',
-  '/Leader/index.html',
+  '/mobile-ready-web-app/',
+  '/mobile-ready-web-app/index.html',
 ];
 
 self.addEventListener('install', event => {
